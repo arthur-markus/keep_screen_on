@@ -4,10 +4,12 @@ mod windows_impl;
 #[cfg(target_os = "linux")]
 mod linux_impl;
 
-pub fn keep_screen_on(enable: bool) {
+pub fn keep_screen_on(enable: bool) -> Result<(), String> {
     #[cfg(target_os = "windows")]
     {
         windows_impl::ScreenKeepOn::keep_screen_on(enable);
+
+        Ok(())
     }
 
     #[cfg(target_os = "linux")]
@@ -21,6 +23,10 @@ pub fn keep_screen_on(enable: bool) {
         }
 
         let mut screen_keep_on = SCREEN_KEEP_ON.lock().unwrap();
-        screen_keep_on.keep_screen_on(enable);
+        screen_keep_on
+            .keep_screen_on(enable)
+            .map_err(|e| e.to_string())?;
+
+        Ok(())
     }
 }
