@@ -1,0 +1,8 @@
+[package]
+name = "keep_screen_on_app"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.100"
+keep_screen_on_lib = { version = "0.1.0", path = "../keep_screen_on_lib" }
