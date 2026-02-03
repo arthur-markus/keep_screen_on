@@ -1,32 +1,67 @@
+#[cfg(target_os = "linux")]
+use std::sync::Mutex;
+
 #[cfg(target_os = "windows")]
 mod windows_impl;
 
 #[cfg(target_os = "linux")]
 mod linux_impl;
 
-pub fn keep_screen_on(enable: bool) -> Result<(), String> {
-    #[cfg(target_os = "windows")]
-    {
-        windows_impl::ScreenKeepOn::keep_screen_on(enable);
-
-        Ok(())
-    }
-
+pub struct KeepScreenOn {
     #[cfg(target_os = "linux")]
-    {
-        use lazy_static::lazy_static;
-        use std::sync::Mutex;
+    keep_screen_on: Mutex<linux_impl::KeepScreenOn>,
+}
 
-        lazy_static! {
-            static ref SCREEN_KEEP_ON: Mutex<linux_impl::KeepScreenOn> =
-                Mutex::new(linux_impl::KeepScreenOn::default());
+impl KeepScreenOn {
+    pub fn new() -> Self {
+        #[cfg(target_os = "windows")]
+        {
+            Self
         }
 
-        let mut screen_keep_on = SCREEN_KEEP_ON.lock().unwrap();
-        screen_keep_on
-            .keep_screen_on(enable)
-            .map_err(|e| e.to_string())?;
+        #[cfg(target_os = "linux")]
+        {
+            Self {
+                keep_screen_on: Mutex::new(linux_impl::KeepScreenOn::default()),
+            }
+        }
+    }
 
-        Ok(())
+    pub fn enable(&self) -> Result<(), String> {
+        #[cfg(target_os = "windows")]
+        {
+            windows_impl::ScreenKeepOn::keep_screen_on(true);
+
+            Ok(())
+        }
+
+        #[cfg(target_os = "linux")]
+        {
+            let mut screen_keep_on = self.keep_screen_on.lock().unwrap();
+            screen_keep_on
+                .keep_screen_on(true)
+                .map_err(|e| e.to_string())?;
+
+            Ok(())
+        }
+    }
+
+    pub fn disable(&self) -> Result<(), String> {
+        #[cfg(target_os = "windows")]
+        {
+            windows_impl::ScreenKeepOn::keep_screen_on(false);
+
+            Ok(())
+        }
+
+        #[cfg(target_os = "linux")]
+        {
+            let mut screen_keep_on = self.keep_screen_on.lock().unwrap();
+            screen_keep_on
+                .keep_screen_on(false)
+                .map_err(|e| e.to_string())?;
+
+            Ok(())
+        }
     }
 }
