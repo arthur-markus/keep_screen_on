@@ -1,4 +1,5 @@
 mod logic;
+mod timer;
 mod ui;
 
 use eframe::egui;
