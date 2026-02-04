@@ -27,7 +27,7 @@ impl KeepScreenOn {
         }
     }
 
-    pub fn enable(&self) -> Result<(), String> {
+    pub fn enable(&self) -> Result<(), anyhow::Error> {
         #[cfg(target_os = "windows")]
         {
             windows_impl::ScreenKeepOn::keep_screen_on(true);
@@ -38,15 +38,13 @@ impl KeepScreenOn {
         #[cfg(target_os = "linux")]
         {
             let mut screen_keep_on = self.keep_screen_on.lock().unwrap();
-            screen_keep_on
-                .keep_screen_on(true)
-                .map_err(|e| e.to_string())?;
+            screen_keep_on.keep_screen_on(true)?;
 
             Ok(())
         }
     }
 
-    pub fn disable(&self) -> Result<(), String> {
+    pub fn disable(&self) -> Result<(), anyhow::Error> {
         #[cfg(target_os = "windows")]
         {
             windows_impl::ScreenKeepOn::keep_screen_on(false);
@@ -57,9 +55,7 @@ impl KeepScreenOn {
         #[cfg(target_os = "linux")]
         {
             let mut screen_keep_on = self.keep_screen_on.lock().unwrap();
-            screen_keep_on
-                .keep_screen_on(false)
-                .map_err(|e| e.to_string())?;
+            screen_keep_on.keep_screen_on(false)?;
 
             Ok(())
         }
