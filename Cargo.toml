@@ -7,7 +7,7 @@ edition = "2024"
 anyhow = "1.0.100"
 
 [target.x86_64-unknown-linux-gnu.dependencies]
-dbus = "0.9.10"
+zbus = "5.13.2"
 
 [target.x86_64-pc-windows-msvc.dependencies]
 windows = "0.62.2"

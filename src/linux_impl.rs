@@ -1,36 +1,51 @@
 use anyhow::Context;
-use dbus::blocking::Connection;
 use std::time::Duration;
+use zbus::{blocking::Connection, proxy, Result};
 
-#[derive(Default)]
+#[proxy(
+    interface = "org.freedesktop.ScreenSaver",
+    default_service = "org.freedesktop.ScreenSaver",
+    default_path = "/org/freedesktop/ScreenSaver"
+)]
+trait ScreenSaver {
+    fn Inhibit(&self, application_name: String, reason_for_inhibit: String) -> Result<u32>;
+    fn UnInhibit(&self, cookie: u32) -> Result<()>;
+}
+
 pub(crate) struct KeepScreenOn {
     cookie: u32,
+    conn: Connection,
 }
 
 impl KeepScreenOn {
-    pub(crate) fn keep_screen_on(&mut self, enable: bool) -> Result<(), anyhow::Error> {
-        let conn = Connection::new_session().context("Failed to connect to D-Bus")?;
-        let proxy = conn.with_proxy(
-            "org.freedesktop.ScreenSaver",
-            "/org/freedesktop/ScreenSaver",
-            Duration::from_millis(5000),
-        );
+    pub(crate) fn new() -> Self {
+        Self {
+            cookie: 0,
+            conn: Connection::session().expect("Failed to connect to D-Bus"),
+        }
+    }
+
+    pub(crate) fn keep_screen_on(
+        &mut self,
+        enable: bool,
+    ) -> std::result::Result<(), anyhow::Error> {
+        let proxy =
+            ScreenSaverProxyBlocking::new(&self.conn).expect("Failed to create a D-Bus Proxy");
 
         if enable {
-            let (cookie,) = proxy
-                .method_call(
-                    "org.freedesktop.ScreenSaver",
-                    "Inhibit",
-                    ("keep_screen_on", "Preventing screen from sleeping"),
+            self.cookie = proxy
+                .Inhibit(
+                    "Keep Screen On".into(),
+                    "Preventing screen from sleeping".into(),
                 )
-                .context("Failed to Inhibit the ScreenSaver")?;
-            self.cookie = cookie;
+                .context("Failed to inhibit screen saver")?;
 
             Ok(())
         } else {
-            let () = proxy
-                .method_call("org.freedesktop.ScreenSaver", "UnInhibit", (self.cookie,))
-                .context("Failed to UnInhibit the ScreenSaver")?;
+            proxy
+                .UnInhibit(self.cookie)
+                .context("Failed to uninhibit screen saver")?;
+
             self.cookie = 0;
 
             Ok(())

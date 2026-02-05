@@ -22,7 +22,7 @@ impl KeepScreenOn {
         #[cfg(target_os = "linux")]
         {
             Self {
-                keep_screen_on: Mutex::new(linux_impl::KeepScreenOn::default()),
+                keep_screen_on: Mutex::new(linux_impl::KeepScreenOn::new()),
             }
         }
     }
