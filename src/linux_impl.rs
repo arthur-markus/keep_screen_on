@@ -1,5 +1,4 @@
 use anyhow::Context;
-use std::time::Duration;
 use zbus::{blocking::Connection, proxy, Result};
 
 #[proxy(
