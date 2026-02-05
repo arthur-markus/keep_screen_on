@@ -11,21 +11,21 @@ pub struct AppUI {
 }
 
 #[derive(Default, PartialEq, Copy, Clone)]
-pub enum CurrentState {
+enum CurrentState {
     Enabled,
     #[default]
     Disabled,
 }
 
 #[derive(Default, PartialEq, Copy, Clone)]
-pub enum CurrentMode {
+enum CurrentMode {
     #[default]
     Infinite,
     Timed,
 }
 
 #[derive(Default, PartialEq, Copy, Clone)]
-pub enum DurationUnit {
+enum DurationUnit {
     #[default]
     Minutes,
     Hours,
@@ -104,13 +104,13 @@ impl eframe::App for AppUI {
                             CurrentState::Enabled => match self.backend.disable() {
                                 Ok(_) => self.current_state = CurrentState::Disabled,
                                 Err(e) => {
-                                    eprintln!("Error disabling KeepScreenOn: {}", e);
+                                    eprintln!("Failed to toggle state: {e}");
                                 }
                             },
                             CurrentState::Disabled => match self.backend.enable() {
                                 Ok(_) => self.current_state = CurrentState::Enabled,
                                 Err(e) => {
-                                    eprintln!("Error enabling KeepScreenOn: {}", e);
+                                    eprintln!("Failed to toggle state: {e}");
                                 }
                             },
                         }
