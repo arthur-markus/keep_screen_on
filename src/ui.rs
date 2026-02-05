@@ -1,51 +1,60 @@
 use egui::Widget;
 
-use crate::logic::{AppData, CurrentMode, CurrentState, DurationUnit, Logic};
+use keep_screen_on_lib::KeepScreenOn;
 
 pub struct AppUI {
-    logic: Logic,
-    app_data: AppData,
-    need_to_toggle_state: bool,
+    current_mode: CurrentMode,
+    current_state: CurrentState,
+    duration_value: u32,
+    duration_unit: DurationUnit,
+    backend: KeepScreenOn,
+}
+
+#[derive(Default, PartialEq, Copy, Clone)]
+pub enum CurrentState {
+    Enabled,
+    #[default]
+    Disabled,
+}
+
+#[derive(Default, PartialEq, Copy, Clone)]
+pub enum CurrentMode {
+    #[default]
+    Infinite,
+    Timed,
+}
+
+#[derive(Default, PartialEq, Copy, Clone)]
+pub enum DurationUnit {
+    #[default]
+    Minutes,
+    Hours,
 }
 
 impl AppUI {
     pub fn new() -> Self {
-        let mut logic = Logic::new();
-
-        logic.process_state_change();
-
         Self {
-            logic,
-            app_data: AppData::default(),
-            need_to_toggle_state: false,
+            current_mode: CurrentMode::default(),
+            current_state: CurrentState::default(),
+            duration_value: 1,
+            duration_unit: DurationUnit::default(),
+            backend: KeepScreenOn::new(),
         }
     }
 }
 
 impl eframe::App for AppUI {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        if self.need_to_toggle_state {
-            match self.logic.toggle_state(self.app_data) {
-                Ok(result) => {
-                    self.app_data.current_state = result;
-                    self.need_to_toggle_state = false;
-                }
-                Err(e) => {
-                    panic!("Error toggling state: {}", e);
-                }
-            }
-        }
-
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.vertical(|ui| {
                 ui.radio_value(
-                    &mut self.app_data.current_mode,
+                    &mut self.current_mode,
                     CurrentMode::Infinite,
                     "Infinite Mode",
                 );
 
                 ui.radio_value(
-                    &mut self.app_data.current_mode,
+                    &mut self.current_mode,
                     CurrentMode::Timed,
                     "Time-Limited Mode",
                 );
@@ -53,29 +62,29 @@ impl eframe::App for AppUI {
                 ui.horizontal(|ui| {
                     ui.label("Duration: ");
 
-                    ui.add_enabled_ui(self.app_data.current_mode == CurrentMode::Timed, |ui| {
-                        egui::DragValue::new(&mut self.app_data.duration)
-                            .range(match self.app_data.duration_unit {
+                    ui.add_enabled_ui(self.current_mode == CurrentMode::Timed, |ui| {
+                        egui::DragValue::new(&mut self.duration_value)
+                            .range(match self.duration_unit {
                                 DurationUnit::Minutes => 1..=60,
                                 DurationUnit::Hours => 1..=12,
                             })
                             .ui(ui)
                     });
 
-                    ui.add_enabled_ui(self.app_data.current_mode == CurrentMode::Timed, |ui| {
+                    ui.add_enabled_ui(self.current_mode == CurrentMode::Timed, |ui| {
                         egui::ComboBox::from_label("")
-                            .selected_text(match self.app_data.duration_unit {
+                            .selected_text(match self.duration_unit {
                                 DurationUnit::Minutes => "Minutes",
                                 DurationUnit::Hours => "Hours",
                             })
                             .show_ui(ui, |ui| {
                                 ui.selectable_value(
-                                    &mut self.app_data.duration_unit,
+                                    &mut self.duration_unit,
                                     DurationUnit::Minutes,
                                     "Minutes",
                                 );
                                 ui.selectable_value(
-                                    &mut self.app_data.duration_unit,
+                                    &mut self.duration_unit,
                                     DurationUnit::Hours,
                                     "Hours",
                                 );
@@ -85,13 +94,26 @@ impl eframe::App for AppUI {
 
                 ui.vertical_centered(|ui| {
                     if ui
-                        .button(match self.app_data.current_state {
+                        .button(match self.current_state {
                             CurrentState::Enabled => "Deactivate",
                             CurrentState::Disabled => "Activate",
                         })
                         .clicked()
                     {
-                        self.need_to_toggle_state = true;
+                        match self.current_state {
+                            CurrentState::Enabled => match self.backend.disable() {
+                                Ok(_) => self.current_state = CurrentState::Disabled,
+                                Err(e) => {
+                                    eprintln!("Error disabling KeepScreenOn: {}", e);
+                                }
+                            },
+                            CurrentState::Disabled => match self.backend.enable() {
+                                Ok(_) => self.current_state = CurrentState::Enabled,
+                                Err(e) => {
+                                    eprintln!("Error enabling KeepScreenOn: {}", e);
+                                }
+                            },
+                        }
                     }
                 });
             });
