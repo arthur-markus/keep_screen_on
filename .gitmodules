@@ -1,6 +1,0 @@
-[submodule "keep_screen_on_app"]
-	path = keep_screen_on_app
-	url = ./keep_screen_on_app/
-[submodule "keep_screen_on_lib"]
-	path = keep_screen_on_lib
-	url = ./keep_screen_on_lib/
