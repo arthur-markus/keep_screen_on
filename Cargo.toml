@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "keep_screen_on_app",
+    "keep_screen_on_lib",
+]
+resolver = "3"
