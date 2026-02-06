@@ -1,0 +1,13 @@
+[package]
+name = "keep_screen_on_lib"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.100"
+
+[target.x86_64-unknown-linux-gnu.dependencies]
+zbus = "5.13.2"
+
+[target.x86_64-pc-windows-msvc.dependencies]
+windows = "0.62.2"
