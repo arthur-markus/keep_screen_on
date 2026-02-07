@@ -43,7 +43,7 @@ impl AppUI {
             current_state: CurrentState::default(),
             duration_value: 1,
             duration_unit: DurationUnit::default(),
-            backend: KeepScreenOn::new(),
+            backend: KeepScreenOn::default(),
             wrap_up_time: Instant::now(),
             status_text: "Ready".into(),
             did_error_occur: false,
@@ -73,48 +73,50 @@ impl eframe::App for AppUI {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.vertical(|ui| {
-                ui.radio_value(
-                    &mut self.current_mode,
-                    CurrentMode::Infinite,
-                    "Infinite Mode",
-                );
+                ui.add_enabled_ui(self.current_state == CurrentState::Disabled, |ui| {
+                    ui.radio_value(
+                        &mut self.current_mode,
+                        CurrentMode::Infinite,
+                        "Infinite Mode",
+                    );
 
-                ui.radio_value(
-                    &mut self.current_mode,
-                    CurrentMode::Timed,
-                    "Time-Limited Mode",
-                );
+                    ui.radio_value(
+                        &mut self.current_mode,
+                        CurrentMode::Timed,
+                        "Time-Limited Mode",
+                    );
 
-                ui.horizontal(|ui| {
-                    ui.label("Duration: ");
+                    ui.horizontal(|ui| {
+                        ui.label("Duration: ");
 
-                    ui.add_enabled_ui(self.current_mode == CurrentMode::Timed, |ui| {
-                        egui::DragValue::new(&mut self.duration_value)
-                            .range(match self.duration_unit {
-                                DurationUnit::Minutes => 1..=60,
-                                DurationUnit::Hours => 1..=12,
-                            })
-                            .ui(ui)
-                    });
+                        ui.add_enabled_ui(self.current_mode == CurrentMode::Timed, |ui| {
+                            egui::DragValue::new(&mut self.duration_value)
+                                .range(match self.duration_unit {
+                                    DurationUnit::Minutes => 1..=60,
+                                    DurationUnit::Hours => 1..=12,
+                                })
+                                .ui(ui)
+                        });
 
-                    ui.add_enabled_ui(self.current_mode == CurrentMode::Timed, |ui| {
-                        egui::ComboBox::from_label("")
-                            .selected_text(match self.duration_unit {
-                                DurationUnit::Minutes => "Minutes",
-                                DurationUnit::Hours => "Hours",
-                            })
-                            .show_ui(ui, |ui| {
-                                ui.selectable_value(
-                                    &mut self.duration_unit,
-                                    DurationUnit::Minutes,
-                                    "Minutes",
-                                );
-                                ui.selectable_value(
-                                    &mut self.duration_unit,
-                                    DurationUnit::Hours,
-                                    "Hours",
-                                );
-                            });
+                        ui.add_enabled_ui(self.current_mode == CurrentMode::Timed, |ui| {
+                            egui::ComboBox::from_label("")
+                                .selected_text(match self.duration_unit {
+                                    DurationUnit::Minutes => "Minutes",
+                                    DurationUnit::Hours => "Hours",
+                                })
+                                .show_ui(ui, |ui| {
+                                    ui.selectable_value(
+                                        &mut self.duration_unit,
+                                        DurationUnit::Minutes,
+                                        "Minutes",
+                                    );
+                                    ui.selectable_value(
+                                        &mut self.duration_unit,
+                                        DurationUnit::Hours,
+                                        "Hours",
+                                    );
+                                });
+                        });
                     });
                 });
 

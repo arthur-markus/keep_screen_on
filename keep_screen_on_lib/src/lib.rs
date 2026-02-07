@@ -9,8 +9,8 @@ pub struct KeepScreenOn {
     keep_screen_on: linux_impl::KeepScreenOn,
 }
 
-impl KeepScreenOn {
-    pub fn new() -> Self {
+impl Default for KeepScreenOn {
+    fn default() -> Self {
         #[cfg(target_os = "windows")]
         {
             Self
@@ -23,7 +23,9 @@ impl KeepScreenOn {
             }
         }
     }
+}
 
+impl KeepScreenOn {
     pub fn enable(&mut self) -> Result<(), anyhow::Error> {
         #[cfg(target_os = "windows")]
         {
