@@ -15,21 +15,21 @@ pub struct AppUI {
     did_error_occur: bool,
 }
 
-#[derive(Default, PartialEq, Copy, Clone)]
+#[derive(Default, PartialEq)]
 enum CurrentState {
     Enabled,
     #[default]
     Disabled,
 }
 
-#[derive(Default, PartialEq, Copy, Clone)]
+#[derive(Default, PartialEq)]
 enum CurrentMode {
     #[default]
     Infinite,
     Timed,
 }
 
-#[derive(Default, PartialEq, Copy, Clone)]
+#[derive(Default, PartialEq)]
 enum DurationUnit {
     #[default]
     Minutes,
