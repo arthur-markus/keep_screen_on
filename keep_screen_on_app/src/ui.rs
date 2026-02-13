@@ -87,18 +87,20 @@ impl eframe::App for AppUI {
                     );
 
                     ui.horizontal(|ui| {
-                        ui.label("Duration: ");
-
                         ui.add_enabled_ui(self.current_mode == CurrentMode::Timed, |ui| {
+                            ui.label("Duration: ");
+
+                            if self.duration_unit == DurationUnit::Hours {
+                                self.duration_value = std::cmp::min(12, self.duration_value);
+                            }
+
                             egui::DragValue::new(&mut self.duration_value)
                                 .range(match self.duration_unit {
                                     DurationUnit::Minutes => 1..=60,
                                     DurationUnit::Hours => 1..=12,
                                 })
-                                .ui(ui)
-                        });
+                                .ui(ui);
 
-                        ui.add_enabled_ui(self.current_mode == CurrentMode::Timed, |ui| {
                             egui::ComboBox::from_label("")
                                 .selected_text(match self.duration_unit {
                                     DurationUnit::Minutes => "Minutes",
