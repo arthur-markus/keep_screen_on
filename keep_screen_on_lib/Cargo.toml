@@ -10,4 +10,7 @@ anyhow = "1.0.100"
 zbus = "5.13.2"
 
 [target.x86_64-pc-windows-msvc.dependencies]
-windows = "0.62.2"
+windows = { version = "0.62.2", features = ["Win32", "Win32_System", "Win32_System_Power"] }
+
+[target.x86_64-pc-windows-gnu.dependencies]
+windows = { version = "0.62.2", features = ["Win32", "Win32_System", "Win32_System_Power"] }

@@ -13,7 +13,7 @@ impl Default for KeepScreenOn {
     fn default() -> Self {
         #[cfg(target_os = "windows")]
         {
-            Self
+            Self {}
         }
 
         #[cfg(target_os = "linux")]
@@ -29,7 +29,7 @@ impl KeepScreenOn {
     pub fn enable(&mut self) -> Result<(), anyhow::Error> {
         #[cfg(target_os = "windows")]
         {
-            windows_impl::ScreenKeepOn::keep_screen_on(true);
+            windows_impl::KeepScreenOn::keep_screen_on(true);
 
             Ok(())
         }
@@ -45,7 +45,7 @@ impl KeepScreenOn {
     pub fn disable(&mut self) -> Result<(), anyhow::Error> {
         #[cfg(target_os = "windows")]
         {
-            windows_impl::ScreenKeepOn::keep_screen_on(false);
+            windows_impl::KeepScreenOn::keep_screen_on(false);
 
             Ok(())
         }
