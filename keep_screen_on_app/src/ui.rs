@@ -49,10 +49,28 @@ impl AppUI {
             did_error_occur: false,
         }
     }
+
+    fn clean_up(&mut self) {
+        if self.current_state == CurrentState::Enabled {
+            match self.backend.disable() {
+                Ok(_) => {
+                    self.current_state = CurrentState::Disabled;
+                    self.status_text = "Successfully Deactivated".into();
+                    self.did_error_occur = false;
+                }
+                Err(_) => {
+                    self.status_text = "Failed to toggle state".into();
+                    self.did_error_occur = true;
+                }
+            }
+        }
+    }
 }
 
 impl eframe::App for AppUI {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        let ctx = ui.ctx();
+
         if self.current_state == CurrentState::Enabled && self.current_mode == CurrentMode::Timed {
             if Instant::now() >= self.wrap_up_time {
                 match self.backend.disable() {
@@ -71,7 +89,7 @@ impl eframe::App for AppUI {
             ctx.request_repaint_after(self.wrap_up_time.duration_since(Instant::now()));
         }
 
-        egui::CentralPanel::default().show(ctx, |ui| {
+        egui::CentralPanel::default().show_inside(ui, |ui| {
             ui.vertical(|ui| {
                 ui.add_enabled_ui(self.current_state == CurrentState::Disabled, |ui| {
                     ui.radio_value(
@@ -178,19 +196,7 @@ impl eframe::App for AppUI {
         });
     }
 
-    fn on_exit(&mut self, _gl: Option<&eframe::glow::Context>) {
-        if self.current_state == CurrentState::Enabled {
-            match self.backend.disable() {
-                Ok(_) => {
-                    self.current_state = CurrentState::Disabled;
-                    self.status_text = "Successfully Deactivated".into();
-                    self.did_error_occur = false;
-                }
-                Err(_) => {
-                    self.status_text = "Failed to toggle state".into();
-                    self.did_error_occur = true;
-                }
-            }
-        }
+    fn on_exit(&mut self) {
+        self.clean_up();
     }
 }
