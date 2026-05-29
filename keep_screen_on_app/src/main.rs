@@ -21,11 +21,7 @@ fn main() -> eframe::Result<()> {
         ..Default::default()
     };
 
-    eframe::run_native(
-        "Keep Screen On",
-        options,
-        Box::new(|_| Ok(Box::new(ui::AppUI::new()))),
-    )?;
+    eframe::run_native("Keep Screen On", options, Box::new(|_| Ok(Box::new(ui::AppUI::new()))))?;
 
     Ok(())
 }
