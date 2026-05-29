@@ -3,6 +3,11 @@ mod ui;
 use eframe::egui;
 
 fn main() -> eframe::Result<()> {
+    #[cfg(target_os = "linux")]
+    unsafe {
+        std::env::remove_var("WAYLAND_DISPLAY");
+    }
+
     let window_size = [240.0, 115.0];
 
     let options = eframe::NativeOptions {
