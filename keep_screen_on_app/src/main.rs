@@ -3,11 +3,6 @@ mod ui;
 use eframe::egui;
 
 fn main() -> eframe::Result<()> {
-    #[cfg(target_os = "linux")]
-    unsafe {
-        std::env::remove_var("WAYLAND_DISPLAY");
-    }
-
     let window_size = [240.0, 115.0];
 
     let options = eframe::NativeOptions {
@@ -21,7 +16,11 @@ fn main() -> eframe::Result<()> {
         ..Default::default()
     };
 
-    eframe::run_native("Keep Screen On", options, Box::new(|_| Ok(Box::new(ui::AppUI::new()))))?;
+    eframe::run_native(
+        "Keep Screen On",
+        options,
+        Box::new(|_| Ok(Box::new(ui::AppUI::new()))),
+    )?;
 
     Ok(())
 }

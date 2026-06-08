@@ -71,6 +71,10 @@ impl eframe::App for AppUI {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         let ctx = ui.ctx();
 
+        if let Some(_) = ctx.input(|i| i.viewport().maximized) {
+            ctx.send_viewport_cmd(egui::ViewportCommand::Maximized(false));
+        }
+
         if self.current_state == CurrentState::Enabled && self.current_mode == CurrentMode::Timed {
             if Instant::now() >= self.wrap_up_time {
                 match self.backend.disable() {
