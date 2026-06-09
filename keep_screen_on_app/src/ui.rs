@@ -71,7 +71,7 @@ impl eframe::App for AppUI {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         let ctx = ui.ctx();
 
-        if let Some(_) = ctx.input(|i| i.viewport().maximized) {
+        if ctx.input(|i| i.viewport().maximized.unwrap_or(false)) {
             ctx.send_viewport_cmd(egui::ViewportCommand::Maximized(false));
         }
 
