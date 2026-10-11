@@ -1,3 +1,6 @@
+#[cfg(not(any(target_os = "windows", target_os = "linux")))]
+compile_error!("This crate only supports Windows and Linux platforms.");
+
 #[cfg(target_os = "windows")]
 mod windows_impl;
 

@@ -2,6 +2,9 @@ use std::time::{Duration, Instant};
 
 use egui::Widget;
 
+#[cfg(feature = "csd")]
+use egui_material_icons::icons::*;
+
 use keep_screen_on_lib::KeepScreenOn;
 
 pub struct AppUI {
@@ -65,10 +68,80 @@ impl AppUI {
             }
         }
     }
-}
 
-impl eframe::App for AppUI {
-    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+    #[cfg(feature = "csd")]
+    fn window_decorations(&mut self, ui: &mut egui::Ui) {
+        egui::CentralPanel::default()
+            .frame(
+                egui::Frame::default()
+                    .inner_margin(2)
+                    .fill(egui::Color32::from_rgb(0, 0, 0)),
+            )
+            .show(ui, |ui| {
+                ui.vertical_centered(|ui| {
+                    ui.horizontal(|ui| {
+                        let titlebar_interaction = ui.interact(
+                            ui.max_rect(),
+                            ui.id().with("drag_area"),
+                            egui::Sense::click_and_drag(),
+                        );
+
+                        if titlebar_interaction.drag_started_by(egui::PointerButton::Primary) {
+                            ui.ctx().send_viewport_cmd(egui::ViewportCommand::StartDrag);
+                        }
+
+                        let title_interaction = ui
+                            .add(
+                                egui::Label::new(
+                                    egui::RichText::new("Keep Screen On")
+                                        .heading()
+                                        .color(egui::Color32::from_rgb(210, 210, 210)),
+                                )
+                                .selectable(false),
+                            )
+                            .interact(egui::Sense::click_and_drag());
+
+                        if title_interaction.drag_started_by(egui::PointerButton::Primary) {
+                            ui.ctx().send_viewport_cmd(egui::ViewportCommand::StartDrag);
+                        }
+
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::RIGHT), |ui| {
+                            if ui
+                                .add(egui::Button::new(ICON_CLOSE).fill(egui::Color32::TRANSPARENT))
+                                .clicked()
+                            {
+                                let ctx = ui.ctx();
+
+                                ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+                            }
+
+                            if ui
+                                .add(
+                                    egui::Button::new(ICON_MINIMIZE)
+                                        .fill(egui::Color32::TRANSPARENT),
+                                )
+                                .clicked()
+                            {
+                                let ctx = ui.ctx();
+
+                                ctx.send_viewport_cmd(egui::ViewportCommand::Minimized(true));
+                            }
+                        });
+                    });
+
+                    ui.horizontal_centered(|ui| {
+                        self.client_area(
+                            ui,
+                            egui::Frame::default()
+                                .inner_margin(4)
+                                .fill(egui::Color32::from_rgb(20, 20, 20)),
+                        );
+                    });
+                });
+            });
+    }
+
+    fn client_area(&mut self, ui: &mut egui::Ui, frame: egui::Frame) {
         let ctx = ui.ctx();
 
         if ctx.input(|i| i.viewport().maximized.unwrap_or(false)) {
@@ -93,7 +166,7 @@ impl eframe::App for AppUI {
             ctx.request_repaint_after(self.wrap_up_time.duration_since(Instant::now()));
         }
 
-        egui::CentralPanel::default().show_inside(ui, |ui| {
+        egui::CentralPanel::default().frame(frame).show(ui, |ui| {
             ui.vertical(|ui| {
                 ui.add_enabled_ui(self.current_state == CurrentState::Disabled, |ui| {
                     ui.radio_value(
@@ -110,7 +183,7 @@ impl eframe::App for AppUI {
 
                     ui.horizontal(|ui| {
                         ui.add_enabled_ui(self.current_mode == CurrentMode::Timed, |ui| {
-                            ui.label("Duration: ");
+                            ui.add(egui::Label::new("Duration: ").selectable(false));
 
                             if self.duration_unit == DurationUnit::Hours {
                                 self.duration_value = std::cmp::min(12, self.duration_value);
@@ -190,14 +263,31 @@ impl eframe::App for AppUI {
                     }
                 });
 
-                ui.label(egui::RichText::new(self.status_text.clone()).color(
-                    match self.did_error_occur {
-                        true => egui::Color32::RED,
-                        false => egui::Color32::GREEN,
-                    },
-                ));
+                ui.add(
+                    egui::Label::new(egui::RichText::new(self.status_text.clone()).color(
+                        match self.did_error_occur {
+                            true => egui::Color32::RED,
+                            false => egui::Color32::GREEN,
+                        },
+                    ))
+                    .selectable(false),
+                );
             });
         });
+    }
+}
+
+impl eframe::App for AppUI {
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        #[cfg(feature = "csd")]
+        {
+            self.window_decorations(ui);
+        }
+
+        #[cfg(not(feature = "csd"))]
+        {
+            self.client_area(ui, egui::Frame::default().inner_margin(6));
+        }
     }
 
     fn on_exit(&mut self) {
