@@ -110,9 +110,7 @@ impl AppUI {
                                 .add(egui::Button::new(ICON_CLOSE).fill(egui::Color32::TRANSPARENT))
                                 .clicked()
                             {
-                                let ctx = ui.ctx();
-
-                                ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+                                ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
                             }
 
                             if ui
@@ -122,9 +120,8 @@ impl AppUI {
                                 )
                                 .clicked()
                             {
-                                let ctx = ui.ctx();
-
-                                ctx.send_viewport_cmd(egui::ViewportCommand::Minimized(true));
+                                ui.ctx()
+                                    .send_viewport_cmd(egui::ViewportCommand::Minimized(true));
                             }
                         });
                     });

@@ -11,5 +11,5 @@ csd = ["dep:egui_material_icons"]
 anyhow = "1.0.104"
 eframe = "0.36.2"
 egui = "0.36.2"
-egui_material_icons = { version = "0.8.0", features = ["compressed", "outline"], optional = true }
+egui_material_icons = { version = "0.8.0", features = ["compressed"], optional = true }
 keep_screen_on_lib = { version = "0.1.0", path = "../keep_screen_on_lib" }
