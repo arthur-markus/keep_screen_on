@@ -1680,6 +1680,7 @@ dependencies = [
  "egui",
  "egui_material_icons",
  "keep_screen_on_lib",
+ "winit",
 ]
 
 [[package]]

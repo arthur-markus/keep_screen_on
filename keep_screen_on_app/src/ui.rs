@@ -70,7 +70,7 @@ impl AppUI {
     }
 
     #[cfg(feature = "csd")]
-    fn window_decorations(&mut self, ui: &mut egui::Ui) {
+    fn window_decorations(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
         egui::CentralPanel::default()
             .frame(
                 egui::Frame::default()
@@ -103,6 +103,19 @@ impl AppUI {
 
                         if title_interaction.drag_started_by(egui::PointerButton::Primary) {
                             ui.ctx().send_viewport_cmd(egui::ViewportCommand::StartDrag);
+                        }
+
+                        if title_interaction.secondary_clicked() {
+                            if let Some(winit_window) = frame.winit_window() {
+                                if let Some(pos) = ui.ctx().pointer_interact_pos() {
+                                    let scale_factor = winit_window.scale_factor();
+
+                                    let pos = winit::dpi::LogicalPosition::new(pos.x, pos.y)
+                                        .to_physical::<f64>(scale_factor);
+
+                                    winit_window.show_window_menu(pos);
+                                }
+                            }
                         }
 
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::RIGHT), |ui| {
@@ -278,7 +291,7 @@ impl eframe::App for AppUI {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         #[cfg(feature = "csd")]
         {
-            self.window_decorations(ui);
+            self.window_decorations(ui, _frame);
         }
 
         #[cfg(not(feature = "csd"))]

@@ -28,15 +28,14 @@ fn main() -> eframe::Result<()> {
         ..Default::default()
     };
 
-    #[cfg_attr(not(feature = "csd"), allow(unused_variables))]
     eframe::run_native(
         "Keep Screen On",
         options,
-        Box::new(|cc| {
+        Box::new(|_cc| {
             #[cfg(feature = "csd")]
             {
-                egui_material_icons::initialize(&cc.egui_ctx);
-                cc.egui_ctx.add_font(egui_material_icons::font_insert());
+                egui_material_icons::initialize(&_cc.egui_ctx);
+                _cc.egui_ctx.add_font(egui_material_icons::font_insert());
             }
 
             Ok(Box::new(ui::AppUI::new()))
