@@ -5,25 +5,58 @@ mod ui;
 
 use eframe::egui;
 
-fn main() -> eframe::Result<()> {
+#[cfg(all(target_os = "linux", not(feature = "csd")))]
+fn is_gnome_desktop() -> bool {
+    for env_var in &[
+        "XDG_MENU_PREFIX",
+        "XDG_CURRENT_DESKTOP",
+        "DESKTOP_SESSION",
+        "GDMSESSION",
+    ] {
+        if let Ok(value) = std::env::var(env_var) {
+            if value.to_lowercase().contains("gnome") {
+                return true;
+            }
+        }
+    }
+
+    false
+}
+
+fn adjust_window_size(original_size: [f32; 2]) -> [f32; 2] {
+    #[cfg(all(target_os = "linux", not(feature = "csd")))]
+    {
+        if is_gnome_desktop() {
+            return [original_size[0] + 5.0, original_size[1] + 3.0];
+        } else {
+            return original_size;
+        }
+    }
+
     #[cfg(feature = "csd")]
-    let window_size = [225.0, 135.0];
+    {
+        return [original_size[0] + 4.0, original_size[1] + 27.0];
+    }
 
-    #[cfg(not(feature = "csd"))]
-    let window_size = [237.0, 110.0];
+    #[cfg(all(not(target_os = "linux"), not(feature = "csd")))]
+    {
+        return original_size;
+    }
+}
 
-    let viewport = egui::ViewportBuilder::default()
-        .with_inner_size(window_size)
-        .with_max_inner_size(window_size)
-        .with_min_inner_size(window_size)
-        .with_resizable(false)
-        .with_maximize_button(false);
+fn main() -> eframe::Result<()> {
+    let base_size = [221.0, 110.0];
+
+    let final_size = adjust_window_size(base_size);
 
     let options = eframe::NativeOptions {
-        viewport: match cfg!(feature = "csd") {
-            true => viewport.with_decorations(false),
-            false => viewport,
-        },
+        viewport: egui::ViewportBuilder::default()
+            .with_inner_size(final_size)
+            .with_max_inner_size(final_size)
+            .with_min_inner_size(final_size)
+            .with_resizable(false)
+            .with_maximize_button(false)
+            .with_decorations(cfg!(not(feature = "csd"))),
         run_and_return: false,
         ..Default::default()
     };
