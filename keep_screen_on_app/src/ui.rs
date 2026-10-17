@@ -39,6 +39,25 @@ enum DurationUnit {
     Hours,
 }
 
+#[cfg(not(feature = "csd"))]
+pub fn is_gnome_desktop() -> bool {
+    #[cfg(target_os = "linux")]
+    for env_var in &[
+        "XDG_MENU_PREFIX",
+        "XDG_CURRENT_DESKTOP",
+        "DESKTOP_SESSION",
+        "GDMSESSION",
+    ] {
+        if let Ok(value) = std::env::var(env_var) {
+            if value.to_lowercase().contains("gnome") {
+                return true;
+            }
+        }
+    }
+
+    false
+}
+
 impl AppUI {
     pub fn new() -> Self {
         Self {
@@ -296,7 +315,9 @@ impl eframe::App for AppUI {
 
         #[cfg(not(feature = "csd"))]
         {
-            self.client_area(ui, egui::Frame::default().inner_margin(6));
+            let offset = 2 * (is_gnome_desktop() as i8);
+
+            self.client_area(ui, egui::Frame::default().inner_margin(4 + offset));
         }
     }
 

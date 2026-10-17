@@ -5,29 +5,14 @@ mod ui;
 
 use eframe::egui;
 
-#[cfg(all(target_os = "linux", not(feature = "csd")))]
-fn is_gnome_desktop() -> bool {
-    for env_var in &[
-        "XDG_MENU_PREFIX",
-        "XDG_CURRENT_DESKTOP",
-        "DESKTOP_SESSION",
-        "GDMSESSION",
-    ] {
-        if let Ok(value) = std::env::var(env_var) {
-            if value.to_lowercase().contains("gnome") {
-                return true;
-            }
-        }
-    }
-
-    false
-}
-
-fn adjust_window_size(original_size: [f32; 2]) -> [f32; 2] {
+fn adjust_window_size(original_size: [f32; 2], _scale_factor: f32) -> [f32; 2] {
     #[cfg(all(target_os = "linux", not(feature = "csd")))]
     {
-        if is_gnome_desktop() {
-            return [original_size[0] + 5.0, original_size[1] + 3.0];
+        if ui::is_gnome_desktop() {
+            return [
+                original_size[0] + (5.0 * _scale_factor),
+                original_size[1] + (3.0 * _scale_factor),
+            ];
         } else {
             return original_size;
         }
@@ -35,7 +20,10 @@ fn adjust_window_size(original_size: [f32; 2]) -> [f32; 2] {
 
     #[cfg(feature = "csd")]
     {
-        return [original_size[0] + 4.0, original_size[1] + 27.0];
+        return [
+            original_size[0] + (4.0 * _scale_factor),
+            original_size[1] + (27.0 * _scale_factor),
+        ];
     }
 
     #[cfg(all(not(target_os = "linux"), not(feature = "csd")))]
@@ -45,9 +33,15 @@ fn adjust_window_size(original_size: [f32; 2]) -> [f32; 2] {
 }
 
 fn main() -> eframe::Result<()> {
-    let base_size = [221.0, 110.0];
+    let scale_factor = display_info::DisplayInfo::all()
+        .ok()
+        .and_then(|display| display.into_iter().find(|d| d.is_primary))
+        .map(|primary| primary.scale_factor)
+        .unwrap_or(1.0);
 
-    let final_size = adjust_window_size(base_size);
+    let base_size = [221.0 * scale_factor, 110.0 * scale_factor];
+
+    let final_size = adjust_window_size(base_size, scale_factor);
 
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
@@ -64,11 +58,14 @@ fn main() -> eframe::Result<()> {
     eframe::run_native(
         "Keep Screen On",
         options,
-        Box::new(|_cc| {
+        Box::new(|cc| {
+            cc.egui_ctx.set_visuals(egui::Visuals::dark());
+            cc.egui_ctx.set_theme(egui::Theme::Dark);
+
             #[cfg(feature = "csd")]
             {
-                egui_material_icons::initialize(&_cc.egui_ctx);
-                _cc.egui_ctx.add_font(egui_material_icons::font_insert());
+                egui_material_icons::initialize(&cc.egui_ctx);
+                cc.egui_ctx.add_font(egui_material_icons::font_insert());
             }
 
             Ok(Box::new(ui::AppUI::new()))
