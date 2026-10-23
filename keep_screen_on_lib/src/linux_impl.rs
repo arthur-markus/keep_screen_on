@@ -1,5 +1,5 @@
 use anyhow::Context;
-use zbus::{proxy, Connection, Result};
+use zbus::{Connection, Result, proxy};
 
 #[proxy(
     interface = "org.freedesktop.ScreenSaver",

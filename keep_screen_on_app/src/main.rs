@@ -20,15 +20,15 @@ fn adjust_window_size(original_size: [f32; 2], _scale_factor: f32) -> [f32; 2] {
 
     #[cfg(feature = "csd")]
     {
-        return [
+        [
             original_size[0] + (4.0 * _scale_factor),
             original_size[1] + (27.0 * _scale_factor),
-        ];
+        ]
     }
 
     #[cfg(all(not(target_os = "linux"), not(feature = "csd")))]
     {
-        return original_size;
+        original_size
     }
 }
 

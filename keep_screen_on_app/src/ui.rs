@@ -124,17 +124,16 @@ impl AppUI {
                             ui.ctx().send_viewport_cmd(egui::ViewportCommand::StartDrag);
                         }
 
-                        if title_interaction.secondary_clicked() {
-                            if let Some(winit_window) = frame.winit_window() {
-                                if let Some(pos) = ui.ctx().pointer_interact_pos() {
-                                    let scale_factor = winit_window.scale_factor();
+                        if title_interaction.secondary_clicked()
+                            && let Some(winit_window) = frame.winit_window()
+                            && let Some(pos) = ui.ctx().pointer_interact_pos()
+                        {
+                            let scale_factor = winit_window.scale_factor();
 
-                                    let pos = winit::dpi::LogicalPosition::new(pos.x, pos.y)
-                                        .to_physical::<f64>(scale_factor);
+                            let pos = winit::dpi::LogicalPosition::new(pos.x, pos.y)
+                                .to_physical::<f64>(scale_factor);
 
-                                    winit_window.show_window_menu(pos);
-                                }
-                            }
+                            winit_window.show_window_menu(pos);
                         }
 
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::RIGHT), |ui| {
