@@ -1,5 +1,5 @@
 use anyhow::Context;
-use zbus::{Result, blocking::Connection, proxy};
+use zbus::{proxy, Connection, Result};
 
 #[proxy(
     interface = "org.freedesktop.ScreenSaver",
@@ -20,7 +20,11 @@ impl KeepScreenOn {
     pub(crate) fn new() -> Self {
         Self {
             cookie: 0,
-            conn: Connection::session().expect("Failed to connect to D-Bus"),
+            conn: zbus::block_on(async {
+                Connection::session()
+                    .await
+                    .expect("Failed to connect to D-Bus")
+            }),
         }
     }
 
@@ -28,26 +32,31 @@ impl KeepScreenOn {
         &mut self,
         enable: bool,
     ) -> std::result::Result<(), anyhow::Error> {
-        let proxy =
-            ScreenSaverProxyBlocking::new(&self.conn).expect("Failed to create a D-Bus Proxy");
+        zbus::block_on(async {
+            let proxy = ScreenSaverProxy::new(&self.conn)
+                .await
+                .expect("Failed to create a D-Bus Proxy");
 
-        if enable {
-            self.cookie = proxy
-                .Inhibit(
-                    "Keep Screen On".into(),
-                    "Preventing screen from sleeping".into(),
-                )
-                .context("Failed to inhibit screen saver")?;
+            if enable {
+                self.cookie = proxy
+                    .Inhibit(
+                        "Keep Screen On".into(),
+                        "Preventing screen from sleeping".into(),
+                    )
+                    .await
+                    .context("Failed to inhibit screen saver")?;
 
-            Ok(())
-        } else {
-            proxy
-                .UnInhibit(self.cookie)
-                .context("Failed to uninhibit screen saver")?;
+                Ok(())
+            } else {
+                proxy
+                    .UnInhibit(self.cookie)
+                    .await
+                    .context("Failed to uninhibit screen saver")?;
 
-            self.cookie = 0;
+                self.cookie = 0;
 
-            Ok(())
-        }
+                Ok(())
+            }
+        })
     }
 }
