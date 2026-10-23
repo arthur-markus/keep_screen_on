@@ -101,7 +101,7 @@ impl AppUI {
                     ui.horizontal(|ui| {
                         let titlebar_interaction = ui.interact(
                             ui.max_rect(),
-                            ui.id().with("drag_area"),
+                            ui.scope_id().with("drag_area"),
                             egui::Sense::click_and_drag(),
                         );
 
