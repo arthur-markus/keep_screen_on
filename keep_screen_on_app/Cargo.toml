@@ -9,9 +9,9 @@ csd = ["dep:egui_material_icons", "dep:winit"]
 
 [dependencies]
 anyhow = "1.0.104"
-display-info = "0.5.9"
-eframe = "0.36.2"
-egui = "0.36.2"
-egui_material_icons = { version = "0.8.0", features = ["compressed"], optional = true }
-keep_screen_on_lib = { version = "0.1.0", path = "../keep_screen_on_lib" }
+display-info = "0.5.10"
+eframe = "0.37.0"
+egui = "0.37.0"
+egui_material_icons = { version = "0.9.0", features = ["compressed"], optional = true }
 winit = { version = "0.30.13", optional = true }
+keep_screen_on_lib = { version = "0.1.0", path = "../keep_screen_on_lib" }

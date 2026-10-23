@@ -7,7 +7,7 @@ edition = "2024"
 anyhow = "1.0.104"
 
 [target.x86_64-unknown-linux-gnu.dependencies]
-zbus = "5.19.0"
+zbus = "6.1.0"
 
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.62.2", features = ["Win32", "Win32_System", "Win32_System_Power"] }
