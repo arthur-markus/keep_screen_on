@@ -39,7 +39,7 @@ fn main() -> eframe::Result<()> {
         .map(|primary| primary.scale_factor)
         .unwrap_or(1.0);
 
-    let base_size = [221.0 * scale_factor, 110.0 * scale_factor];
+    let base_size = [221.0 * scale_factor, 117.0 * scale_factor];
 
     let final_size = adjust_window_size(base_size, scale_factor);
 
