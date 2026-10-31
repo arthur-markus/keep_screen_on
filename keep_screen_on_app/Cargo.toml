@@ -1,7 +1,9 @@
 [package]
 name = "keep_screen_on_app"
-version = "0.1.0"
+description = "An application, which keeps your screen active for as long as you wish"
+version = "1.0.0"
 edition = "2024"
+license = "MIT"
 
 [features]
 default = ["csd"]
@@ -14,4 +16,4 @@ eframe = "0.37.0"
 egui = "0.37.0"
 egui_material_icons = { version = "0.9.0", features = ["compressed"], optional = true }
 winit = { version = "0.30.13", optional = true }
-keep_screen_on_lib = { version = "0.1.0", path = "../keep_screen_on_lib" }
+keep_screen_on_lib = { version = "1.0.0", path = "../keep_screen_on_lib" }
