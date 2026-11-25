@@ -15,6 +15,9 @@ category = "Utility"
 short_description = "A small utility for keeping the screen on"
 long_description = "A small utility for keeping the screen on"
 
+[package.metadata.bundle.linux]
+startup_wm_class = "keep_screen_on"
+
 [features]
 default = ["csd"]
 csd = ["dep:egui_material_icons", "dep:winit"]
