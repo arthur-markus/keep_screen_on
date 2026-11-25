@@ -50,7 +50,8 @@ fn main() -> eframe::Result<()> {
             .with_min_inner_size(final_size)
             .with_resizable(false)
             .with_maximize_button(false)
-            .with_decorations(cfg!(not(feature = "csd"))),
+            .with_decorations(cfg!(not(feature = "csd")))
+            .with_app_id(env!("CARGO_PKG_NAME")),
         run_and_return: false,
         ..Default::default()
     };
