@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Keep Screen On
+Comment=A small utility for keeping the screen on
+Exec=keep_screen_on
+Icon=keep_screen_on
+Categories=Utility;
+Terminal=false

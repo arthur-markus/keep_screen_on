@@ -1,9 +1,24 @@
 [package]
-name = "keep_screen_on_app"
+name = "keep_screen_on"
 description = "An application, which keeps your screen active for as long as you wish"
 version = "1.0.0"
 edition = "2024"
 license = "MIT"
+
+[package.metadata.appimage]
+icon = "assets/icon.png"
+desktop_entry = "assets/keep_screen_on.desktop"
+auto_link = true
+auto_link_exclude_list = [
+    "linux-vdso.so.*",
+	"libxcb.so.*",
+	"libgcc_s.so.*",
+	"libm.so.*",
+	"libc.so.*",
+	"libXau.so.*",
+	"libXdmcp.so.*",
+	"ld-linux-x86-64.so.*",
+]
 
 [features]
 default = ["csd"]
@@ -16,4 +31,9 @@ eframe = "0.37.0"
 egui = "0.37.0"
 egui_material_icons = { version = "0.9.0", features = ["compressed"], optional = true }
 winit = { version = "0.30.13", optional = true }
-keep_screen_on_lib = { version = "1.0.0", path = "../keep_screen_on_lib" }
+screen_control_library = { version = "1.0.0", path = "../keep_screen_on_lib" }
+
+[build-dependencies]
+winresource = "0.1"
+ico = "0.6"
+image = { version = "0.25", default-features = false, features = ["png", "ico"] }

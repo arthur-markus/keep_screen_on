@@ -1,5 +1,5 @@
 [package]
-name = "keep_screen_on_lib"
+name = "screen_control_library"
 description = "A library for toggling screen locking timer on and off"
 version = "1.0.0"
 edition = "2024"

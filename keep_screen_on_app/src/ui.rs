@@ -5,7 +5,7 @@ use egui::Widget;
 #[cfg(feature = "csd")]
 use egui_material_icons::icons::*;
 
-use keep_screen_on_lib::KeepScreenOn;
+use screen_control_library::KeepScreenOn;
 
 pub struct AppUI {
     current_mode: CurrentMode,
