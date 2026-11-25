@@ -5,20 +5,15 @@ version = "1.0.0"
 edition = "2024"
 license = "MIT"
 
-[package.metadata.appimage]
-icon = "assets/icon.png"
-desktop_entry = "assets/keep_screen_on.desktop"
-auto_link = true
-auto_link_exclude_list = [
-    "linux-vdso.so.*",
-	"libxcb.so.*",
-	"libgcc_s.so.*",
-	"libm.so.*",
-	"libc.so.*",
-	"libXau.so.*",
-	"libXdmcp.so.*",
-	"ld-linux-x86-64.so.*",
-]
+[package.metadata.bundle]
+name = "Keep Screen On"
+identifier = "keep_screen_on"
+appimage_metainfo_path = "assets/keep_screen_on.metainfo.xml"
+icon = ["assets/icon.png"]
+resources = []
+category = "Utility"
+short_description = "A small utility for keeping the screen on"
+long_description = "A small utility for keeping the screen on"
 
 [features]
 default = ["csd"]
